@@ -1,0 +1,93 @@
+----- STARTING TEST: Full Memory Sequence -----
+
+--- Part 1: Testing RegB -> Memory -> RegA ---
+CHECK @ t=2: After MOV B, 99 -> regB =  99
+CHECK @ t=4: After MOV (50), B -> DM[50] =  99
+CHECK @ t=6: After MOV A, (50) -> regA =  99
+
+--- Part 2: Testing RegA -> Memory -> RegB ---
+CHECK @ t=8: After MOV A, 123 -> regA = 123
+CHECK @ t=10: After MOV (51), A -> DM[51] = 123
+CHECK @ t=12: After MOV B, (51) -> regB = 123
+
+--- Part 3: Testing Overwrite and Edge Cases ---
+CHECK @ t=14: After MOV A, 255 -> regA = 255
+CHECK @ t=16: After MOV (50), A [Overwrite] -> DM[50] = 255
+CHECK @ t=18: After MOV A, 0 -> regA =   0
+CHECK @ t=20: After MOV A, (50) [Read Overwritten Value] -> regA = 255
+>>>>> ALL MEMORY SEQUENCE TESTS PASSED! <<<<<
+
+----- STARTING TEST: ADD A, (Dir) -----
+CHECK @ t=22: After MOV A, 100 -> regA = 100
+CHECK @ t=24: After MOV B, 50 -> regB =  50
+CHECK @ t=26: After MOV (120), B -> DM[120] =  50
+CHECK @ t=28: After ADD A, (120) -> regA = 150
+>>>>> ADD A, (Dir) TEST PASSED! <<<<<
+
+----- STARTING TEST: SUB (Dir) -----
+CHECK @ t=30: After MOV A, 100 -> regA = 100
+CHECK @ t=32: After MOV B, 40 -> regB =  40
+CHECK @ t=34: After SUB (200) -> DM[200] =  60
+>>>>> SUB (Dir) TEST PASSED! <<<<<
+
+----- STARTING TEST: AND A, (B) [Indirect Addressing] -----
+CHECK @ t=36: After MOV A, 170 -> regA = 170
+CHECK @ t=38: After MOV (150), A -> DM[150] = 170
+CHECK @ t=40: After MOV A, 204 -> regA = 204
+CHECK @ t=42: After MOV B, 150 -> regB = 150
+CHECK @ t=44: After AND A, (B) -> regA = 136
+>>>>> AND A, (B) TEST PASSED! <<<<<
+
+----- STARTING TEST: OR B, (0x10) [Direct Addressing] -----
+CHECK @ t=46: After MOV B, 195 -> regB = 195
+CHECK @ t=48: After MOV A, 85 -> regA =  85
+CHECK @ t=50: After MOV (16), A -> DM[16] =  85
+CHECK @ t=52: After OR B, (16) -> regB = 215
+>>>>> OR B, (Dir) TEST PASSED! <<<<<
+
+----- STARTING TEST: NOT (B) [Indirect Addressing] -----
+CHECK @ t=54: After MOV A, 165 -> regA = 165
+CHECK @ t=56: After MOV B, 210 -> regB = 210
+CHECK @ t=58: After NOT (B) -> DM[210] =  90
+>>>>> NOT (B) TEST PASSED! <<<<<
+
+----- STARTING TEST: XOR A, (Dir) [Direct Addressing] -----
+CHECK @ t=60: After MOV A, 202 -> regA = 202
+CHECK @ t=62: After MOV B, 172 -> regB = 172
+CHECK @ t=64: After MOV (220), B -> DM[220] = 172
+CHECK @ t=66: After XOR A, (220) -> regA = 102
+>>>>> XOR A, (Dir) TEST PASSED! <<<<<
+
+----- STARTING TEST: SHL (Dir), B [Direct Addressing] -----
+CHECK @ t=68: After MOV B, 85 -> regB =  85
+CHECK @ t=70: After SHL (230), B -> DM[230] = 170
+>>>>> SHL (Dir), B TEST PASSED! <<<<<
+
+----- STARTING TEST: SHR (B) [Indirect Addressing] -----
+CHECK @ t=72: After MOV A, 212 -> regA = 212
+CHECK @ t=74: After MOV B, 240 -> regB = 240
+CHECK @ t=76: After SHR (B) -> DM[240] = 106
+>>>>> SHR (B) TEST PASSED! <<<<<
+
+----- STARTING TEST: INC (Dir) [Read-Modify-Write] -----
+CHECK @ t=80: After Setup 1 -> DM[250] =  77
+CHECK @ t=82: After INC (250) -> DM[250] =  78
+CHECK @ t=86: After Setup 2 -> DM[251] = 255
+CHECK @ t=88: After INC (251) [Overflow] -> DM[251] =   0
+>>>>> INC (Dir) TEST PASSED! <<<<<
+
+----- STARTING TEST: RST (B) [Indirect Addressing] -----
+CHECK @ t=92: After Setup -> DM[255] = 123
+CHECK @ t=94: After MOV B, 255 -> regB = 255
+CHECK @ t=96: After RST (B) -> DM[255] = 123
+ERROR: testbench.v:523: FAIL [RST (B)]: DM[255] expected 0, got 123
+       Time: 96  Scope: test
+>>>>> RST (B) TEST FAILED! <<<<<
+
+----- STARTING TEST: JLE - Case 2 (A == Mem[B]) -----
+CHECK @ t=116: After JLE program (A == Mem[B]) -> DM[100] =   1
+>>>>> JLE (A == Mem[B]) TEST PASSED! <<<<<
+
+----- STARTING TEST: FOR Loop (JGE, JMP) -----
+CHECK @ t=168: After FOR loop, verifying memory...
+>>>>> FOR Loop TEST PASSED! <<<<<
